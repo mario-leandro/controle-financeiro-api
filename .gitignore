@@ -1,0 +1,7 @@
+.env
+logs/*
+.vscode/
+/vendor/*
+composer-setup.php
+composer.json
+composer.lock
