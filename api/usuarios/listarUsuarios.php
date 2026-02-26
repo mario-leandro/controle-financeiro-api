@@ -1,18 +1,22 @@
 <?php
 
-include_once __DIR__ . "/../commom.php";
+include_once __DIR__ . "/../common.php";
 
 headers();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-    responderErro(405, "Método não permitido");
+    http_response_code(405);
+    echo json_encode(["error" => "Método não permitido"]);
     logMsg("Método não permitido em listarUsuarios.php: " . $_SERVER['REQUEST_METHOD']);
+    exit;
 }
 
 $id_usuario = $_GET['id'] ?? null;
+$token = $_GET['token'];
 $db_connection = null;
 
-function listarTodosUsuarios() {
+function listarTodosUsuarios()
+{
     global $db_connection;
 
     $db_connection = new Database();
@@ -21,7 +25,8 @@ function listarTodosUsuarios() {
     return $usuarios;
 }
 
-function buscarUsuarioPorId($id) {
+function buscarUsuarioPorId($id)
+{
     global $db_connection;
 
     $db_connection = new Database();
@@ -34,15 +39,19 @@ try {
     if ($id_usuario) {
         $usuario = buscarUsuarioPorId($id_usuario);
         if ($usuario) {
-            responderJson(200, $usuario);
+            http_response_code(200);
+            echo json_encode(["success" => true, "usuario" => $usuario]);
         } else {
-            responderErro(404, "Usuário não encontrado");
+            http_response_code(404);
+            echo json_encode(["error" => "Usuário não encontrado"]);
         }
     } else {
         $usuarios = listarTodosUsuarios();
-        responderJson(200, $usuarios);
+        http_response_code(200);
+        echo json_encode(["success" => true, "usuarios" => $usuarios]);
     }
 } catch (Exception $e) {
-    responderErro(500, "Erro ao listar usuários: " . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(["error" => "Erro ao listar usuários: " . $e->getMessage()]);
     logMsg("Erro ao listar usuários: " . $e->getMessage());
 }

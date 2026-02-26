@@ -11,8 +11,8 @@ function gerarJwt($usuarioId)
     $secret_key = CHAVE_JWT;
 
     $payload = [
-        "iss" => "controle-financeiro",
-        "aud" => "controle-financeiro-frontend",
+        "iss" => "http://localhost/development/controle-financeiro-api/",
+        "aud" => "http://localhost:3000",
         "sub" => $usuarioId,
         "iat" => time(),
         "exp" => time() + (60 * 15)
@@ -42,7 +42,7 @@ function validarJwt()
         $decoded = JWT::decode($token, new Key(CHAVE_JWT, 'HS256'));
 
         // valida issuer
-        if ($decoded->iss !== "controle-financeiro") {
+        if ($decoded->iss !== "http://localhost/development/controle-financeiro-api/") {
             throw new Exception("Issuer inválido");
         }
 
@@ -55,9 +55,14 @@ function validarJwt()
 }
 
 // Token Refresh
-function refreshJwt($usuarioId)
+function gerarRefreshToken()
 {
-    return gerarJwt($usuarioId);
+    return bin2hex(random_bytes(32)); // 64 caracteres
+}
+
+function hashToken($token)
+{
+    return hash('sha256', $token);
 }
 
 // Logs
