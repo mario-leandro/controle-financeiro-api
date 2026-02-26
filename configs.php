@@ -8,3 +8,5 @@ define('DB_NAME', $_ENV['DB_NAME']);
 define("DIR_LOGS", __DIR__ . "/logs/");
 
 define("URL_TESTE", $_ENV['URL_TESTE']);
+
+define("CHAVE_JWT", $_ENV['CHAVE_JWT']);

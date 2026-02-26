@@ -20,6 +20,17 @@ if ($senha !== $confSenha) {
     logMsg("Tentativa de criação de usuário com senhas não coincidentes para o email: " . $email);
 }
 
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    responderErro(400, "Email inválido");
+    logMsg("Tentativa de criação de usuário com email inválido: " . $email);
+}
+
+// Validação de senha (mínimo 8 caracteres, pelo menos uma letra e um número)
+if (strlen($senha) < 8 || !preg_match("/[a-zA-Z]/", $senha) || !preg_match("/[0-9]/", $senha)) {
+    responderErro(400, "A senha deve ter pelo menos 8 caracteres, incluindo letras e números");
+    logMsg("Tentativa de criação de usuário com senha fraca para o email: " . $email);
+}
+
 $db_connection = null;
 
 try {

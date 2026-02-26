@@ -1,8 +1,68 @@
 <?php
 
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
 require_once __DIR__ . "/configs.php";
 
-function logMsg($msg) {
+// JWT
+function gerarJwt($usuarioId)
+{
+    $secret_key = CHAVE_JWT;
+
+    $payload = [
+        "iss" => "controle-financeiro",
+        "aud" => "controle-financeiro-frontend",
+        "sub" => $usuarioId,
+        "iat" => time(),
+        "exp" => time() + (60 * 15)
+    ];
+
+    $jwt = JWT::encode($payload, $secret_key, 'HS256');
+    return $jwt;
+}
+
+function validarJwt()
+{
+    $headers = getallheaders();
+
+    if (!isset($headers['Authorization'])) {
+        throw new Exception("Token não fornecido");
+    }
+
+    $authHeader = $headers['Authorization'];
+
+    if (!preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+        throw new Exception("Formato do token inválido");
+    }
+
+    $token = $matches[1];
+
+    try {
+        $decoded = JWT::decode($token, new Key(CHAVE_JWT, 'HS256'));
+
+        // valida issuer
+        if ($decoded->iss !== "controle-financeiro") {
+            throw new Exception("Issuer inválido");
+        }
+
+        return $decoded;
+    } catch (\Firebase\JWT\ExpiredException $e) {
+        throw new Exception("Token expirado");
+    } catch (Exception $e) {
+        throw new Exception("Token inválido");
+    }
+}
+
+// Token Refresh
+function refreshJwt($usuarioId)
+{
+    return gerarJwt($usuarioId);
+}
+
+// Logs
+function logMsg($msg)
+{
     $arquivo_log = DIR_LOGS . "log_" . date("Y-m-d") . ".txt";
     $data_hora = date("Y-m-d H:i:s");
     $metodo = $_SERVER['REQUEST_METHOD'] ?? 'N/A';

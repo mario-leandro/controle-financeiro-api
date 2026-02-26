@@ -6,4 +6,4 @@ require_once __DIR__ . '/../configs.php';
 require_once __DIR__ . '/../utils.php';
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-$dotenv->load(); 
+$dotenv->load();
