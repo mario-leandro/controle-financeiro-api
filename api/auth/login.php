@@ -25,12 +25,10 @@ try {
 
     $usuarioId = $usuario['id'];
 
-    // 🔹 Gerar tokens
     $accessToken = gerarJwt($usuarioId);
     $refreshToken = gerarRefreshToken();
     $refreshHash = hashToken($refreshToken);
 
-    // 🔹 Salvar refresh no banco
     $db_connection->insert("authentication", [
         "usuario_id" => $usuarioId,
         "token" => $refreshHash,

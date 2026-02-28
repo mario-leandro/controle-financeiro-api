@@ -1,49 +1,82 @@
 <?php
 
 include_once __DIR__ . "/../common.php";
-
 headers();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    echo json_encode(["error" => "Método não permitido"]);
-    logMsg("Requisição com método não permitido: " . $_SERVER['REQUEST_METHOD']);
     exit;
 }
 
-$body = json_decode(file_get_contents("php://input"), true);
-
-if (!isset($body['refresh_token'])) {
-    throw new Exception("Refresh token não enviado");
-}
-
-$refreshToken = $body['refresh_token'];
-$hash = hashToken($refreshToken);
-
-$db_connection = null;
-
 try {
-    $db_connection = new Database();
 
-    // Buscar no banco
-    $tokenDb = $db_connection->get("authentication", [
-        "token" => $hash,
-        "tipo" => "refresh",
-        "revogado" => false,
-        "dth_expire[>]" => date("Y-m-d H:i:s")
-    ]);
+    $dados = json_decode(file_get_contents("php://input"), true);
 
-    if (!$tokenDb) {
-        throw new Exception("Refresh token inválido");
+    if (empty($dados['refresh_token'])) {
+        http_response_code(400);
+        echo json_encode(["error" => "Refresh token não fornecido"]);
+        exit;
     }
 
-    // Gerar novo JWT
-    $novoJwt = gerarJwt($tokenDb['usuario_id']);
+    $refreshToken = $dados['refresh_token'];
+    $refreshHash = hashToken($refreshToken);
+
+    $db_connection = new Database();
+
+    $buscarRefreshToken = $db_connection->get_limit(
+        "authentication",
+        ["token" => $refreshHash, "tipo" => "refresh"],
+        1
+    );
+
+    $tokenDb = $buscarRefreshToken[0] ?? null;
+
+    if (!$tokenDb) {
+        http_response_code(401);
+        echo json_encode(["error" => "Refresh token inválido"]);
+        exit;
+    }
+
+    if ($tokenDb['revogado'] || strtotime($tokenDb['dth_expire']) < time()) {
+        if ($tokenDb['revogado']) {
+            $db_connection->update(
+                "authentication",
+                ["revogado" => 1],
+                ["usuario_id" => $tokenDb['usuario_id']]
+            );
+        }
+
+        http_response_code(401);
+        echo json_encode(["error" => "Refresh token expirado ou revogado"]);
+        exit;
+    }
+
+    $usuarioId = $tokenDb['usuario_id'];
+
+    $db_connection->update(
+        "authentication",
+        ["revogado" => 1],
+        ["id" => $tokenDb['id']]
+    );
+
+    $novoAccessToken = gerarJwt($usuarioId);
+    $novoRefreshToken = gerarRefreshToken();
+    $novoRefreshHash = hashToken($novoRefreshToken);
+
+    $db_connection->insert("authentication", [
+        "usuario_id" => $usuarioId,
+        "token" => $novoRefreshHash,
+        "tipo" => "refresh",
+        "dth_expire" => date("Y-m-d H:i:s", time() + (60 * 60 * 24 * 30)),
+        "ip" => $_SERVER['REMOTE_ADDR'] ?? null,
+        "user_agent" => $_SERVER['HTTP_USER_AGENT'] ?? null
+    ]);
 
     echo json_encode([
-        "access_token" => $novoJwt
+        "access_token" => $novoAccessToken,
+        "refresh_token" => $novoRefreshToken
     ]);
 } catch (Exception $e) {
-    http_response_code(401);
-    echo json_encode(["error" => $e->getMessage()]);
+    http_response_code(500);
+    echo json_encode(["error" => "Erro ao renovar token"]);
 }

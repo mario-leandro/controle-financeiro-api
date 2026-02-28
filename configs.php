@@ -1,12 +1,12 @@
 <?php
 
-define('DB_HOST', $_ENV['DB_HOST']);
-define('DB_USER', $_ENV['DB_USER']);
-define('DB_PASS', $_ENV['DB_PASS']);
-define('DB_NAME', $_ENV['DB_NAME']);
+define('DB_HOST', getenv('DB_HOST'));
+define('DB_USER', getenv('DB_USER'));
+define('DB_PASS', getenv('DB_PASS'));
+define('DB_NAME', getenv('DB_NAME'));
 
 define("DIR_LOGS", __DIR__ . "/logs/");
 
-define("URL_TESTE", $_ENV['URL_TESTE']);
+define("URL_TESTE", getenv('URL_TESTE'));
 
-define("CHAVE_JWT", $_ENV['CHAVE_JWT']);
+define("CHAVE_JWT", getenv('CHAVE_JWT'));
