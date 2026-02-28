@@ -1,19 +1,26 @@
 <?php
 
-class Database {
+class Database
+{
     protected $db_connection = null;
 
-    function __construct() {
+    function __construct()
+    {
         $this->db_connection = self::getDBConnection();
     }
 
-    private function getDBConnection() {
+    private function getDBConnection()
+    {
         $this->db_connection = null;
 
         try {
-            $this->db_connection = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USER, DB_PASS);
+            $this->db_connection = new PDO(
+                "mysql:host=" . DB_HOST . ";port=3306;dbname=" . DB_NAME . ";charset=utf8mb4",
+                DB_USER,
+                DB_PASS
+            );
             $this->db_connection->exec("set names utf8");
-        } catch(PDOException $e) {
+        } catch (PDOException $e) {
             throw new Exception("Database connection error" . $e->getMessage());
             logMsg("Connection error: " . $e->getMessage());
         }
@@ -21,11 +28,13 @@ class Database {
         return $this->db_connection;
     }
 
-    public function isConnected() {
+    public function isConnected()
+    {
         return $this->db_connection !== null;
     }
 
-    public function get($tabela, $condicao = "", $params = []) {
+    public function get($tabela, $condicao = "", $params = [])
+    {
         try {
             $sql = "SELECT * FROM " . $tabela;
             if ($condicao != "") {
@@ -43,7 +52,8 @@ class Database {
         }
     }
 
-    public function get_limit($tabela, $condicao = "", $limit = 10) {
+    public function get_limit($tabela, $condicao = "", $limit = 10)
+    {
         try {
             $sql = "SELECT * FROM " . $tabela;
             if ($condicao != "") {
@@ -62,7 +72,8 @@ class Database {
         }
     }
 
-    public function insert($tabela, $dados) {
+    public function insert($tabela, $dados)
+    {
         try {
             $colunas = implode(", ", array_keys($dados));
             $placeholders = ":" . implode(", :", array_keys($dados));
@@ -79,7 +90,8 @@ class Database {
         }
     }
 
-    public function update($tabela, $dados, $condicao, $condicaoParams = []) {
+    public function update($tabela, $dados, $condicao, $condicaoParams = [])
+    {
         try {
             $setClause = "";
             $setParams = [];
@@ -91,7 +103,7 @@ class Database {
 
             $sql = "UPDATE " . $tabela . " SET " . $setClause . " WHERE " . $condicao;
             $query = $this->db_connection->prepare($sql);
-            
+
             // Mesclar parâmetros do SET com parâmetros da condição WHERE
             $allParams = array_merge($setParams, $condicaoParams);
             $query->execute($allParams);
@@ -104,7 +116,8 @@ class Database {
         }
     }
 
-    public function delete($tabela, $condicao) {
+    public function delete($tabela, $condicao)
+    {
         try {
             $sql = "DELETE FROM " . $tabela . " WHERE " . $condicao;
             $query = $this->db_connection->prepare($sql);
@@ -118,7 +131,8 @@ class Database {
         }
     }
 
-    public function lastInsertId() {
+    public function lastInsertId()
+    {
         return $this->db_connection->lastInsertId();
     }
 }

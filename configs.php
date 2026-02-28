@@ -1,12 +1,10 @@
 <?php
 
-define('DB_HOST', getenv('DB_HOST'));
-define('DB_USER', getenv('DB_USER'));
-define('DB_PASS', getenv('DB_PASS'));
-define('DB_NAME', getenv('DB_NAME'));
+define('DB_HOST', "192.168.18.72");
+define('DB_USER', "cf_user");
+define('DB_PASS', "#Mario2004");
+define('DB_NAME', "CF_DB");
 
 define("DIR_LOGS", __DIR__ . "/logs/");
 
-define("URL_TESTE", getenv('URL_TESTE'));
-
-define("CHAVE_JWT", getenv('CHAVE_JWT'));
+define("CHAVE_JWT", "bde87d6324f82da210ce6535e5cdc79b77e7a1dff0d1799ad9031418586360b7");
