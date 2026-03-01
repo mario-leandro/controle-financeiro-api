@@ -26,11 +26,21 @@ function validarJwt()
 {
     $headers = getallheaders();
 
-    if (!isset($headers['Authorization'])) {
-        throw new Exception("Token não fornecido");
+    $authHeader = null;
+
+    if (isset($headers['Authorization'])) {
+        $authHeader = $headers['Authorization'];
+    } elseif (isset($headers['authorization'])) {
+        $authHeader = $headers['authorization'];
+    } elseif (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
+        $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
+    } elseif (!empty($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+        $authHeader = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
     }
 
-    $authHeader = $headers['Authorization'];
+    if (!$authHeader) {
+        throw new Exception("Token não fornecido");
+    }
 
     if (!preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
         throw new Exception("Formato do token inválido");

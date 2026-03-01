@@ -8,19 +8,32 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
+$raw = file_get_contents("php://input");
+
+if (!$raw) {
+    http_response_code(400);
+    echo json_encode(["error" => "Body vazio"]);
+    exit;
+}
+
+$dados = json_decode($raw, true);
+
+if (!is_array($dados)) {
+    http_response_code(400);
+    echo json_encode(["error" => "JSON inválido"]);
+    exit;
+}
+
+if (empty($dados['refresh_token'])) {
+    http_response_code(400);
+    echo json_encode(["error" => "Refresh token não fornecido"]);
+    exit;
+}
+
+$refreshToken = $dados['refresh_token'];
+$refreshHash = hashToken($refreshToken);
+
 try {
-
-    $dados = json_decode(file_get_contents("php://input"), true);
-
-    if (empty($dados['refresh_token'])) {
-        http_response_code(400);
-        echo json_encode(["error" => "Refresh token não fornecido"]);
-        exit;
-    }
-
-    $refreshToken = $dados['refresh_token'];
-    $refreshHash = hashToken($refreshToken);
-
     $db_connection = new Database();
 
     $buscarRefreshToken = $db_connection->get_limit(

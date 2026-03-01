@@ -4,6 +4,56 @@ class Database
 {
     protected $db_connection = null;
 
+    private function isSequentialStringList($value)
+    {
+        if (!is_array($value)) {
+            return false;
+        }
+
+        if (array_values($value) !== $value) {
+            return false;
+        }
+
+        foreach ($value as $item) {
+            if (!is_string($item)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function normalizeParams($params)
+    {
+        $normalized = [];
+
+        foreach ($params as $key => $value) {
+            $normalized[ltrim((string)$key, ':')] = $value;
+        }
+
+        return $normalized;
+    }
+
+    private function buildWhereClause($condicao, $prefix = 'where')
+    {
+        if (is_array($condicao)) {
+            $parts = [];
+            $params = [];
+            $index = 0;
+
+            foreach ($condicao as $coluna => $valor) {
+                $paramName = $prefix . '_' . preg_replace('/[^a-zA-Z0-9_]/', '_', (string)$coluna) . '_' . $index;
+                $parts[] = $coluna . ' = :' . $paramName;
+                $params[$paramName] = $valor;
+                $index++;
+            }
+
+            return [implode(' AND ', $parts), $params];
+        }
+
+        return [$condicao, []];
+    }
+
     function __construct()
     {
         $this->db_connection = self::getDBConnection();
@@ -33,16 +83,37 @@ class Database
         return $this->db_connection !== null;
     }
 
-    public function get($tabela, $condicao = "", $params = [])
+    public function get($tabela, $condicao = "", $params = [], $colunas = ['*'])
     {
         try {
-            $sql = "SELECT * FROM " . $tabela;
-            if ($condicao != "") {
-                $sql .= " WHERE " . $condicao;
+            if ($this->isSequentialStringList($params) && is_string($condicao)) {
+                $colunas = $params;
+                $params = [];
+            } elseif ($this->isSequentialStringList($params) && is_array($condicao)) {
+                $colunas = $params;
+                $params = [];
+            }
+
+            $colunasSql = '*';
+            if ($this->isSequentialStringList($colunas) && count($colunas) > 0) {
+                $colunasSql = implode(', ', $colunas);
+            }
+
+            [$whereSql, $whereParams] = $this->buildWhereClause($condicao, 'get');
+
+            $sql = "SELECT " . $colunasSql . " FROM " . $tabela;
+            if ($whereSql != "") {
+                $sql .= " WHERE " . $whereSql;
             }
 
             $query = $this->db_connection->prepare($sql);
-            $query->execute($params);
+
+            $allParams = array_merge(
+                $this->normalizeParams($whereParams),
+                $this->normalizeParams(is_array($params) ? $params : [])
+            );
+
+            $query->execute($allParams);
 
             return $query->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
@@ -56,13 +127,15 @@ class Database
     {
         try {
             $sql = "SELECT * FROM " . $tabela;
-            if ($condicao != "") {
-                $sql .= " WHERE " . $condicao;
+            [$whereSql, $whereParams] = $this->buildWhereClause($condicao, 'limit');
+
+            if ($whereSql != "") {
+                $sql .= " WHERE " . $whereSql;
             }
             $sql .= " LIMIT " . intval($limit);
 
             $query = $this->db_connection->prepare($sql);
-            $query->execute();
+            $query->execute($this->normalizeParams($whereParams));
 
             return $query->fetchAll(PDO::FETCH_ASSOC);
         } catch (Exception $e) {
@@ -96,16 +169,23 @@ class Database
             $setClause = "";
             $setParams = [];
             foreach ($dados as $coluna => $valor) {
-                $setClause .= $coluna . " = :set_" . $coluna . ", ";
-                $setParams[":set_" . $coluna] = $valor;
+                $paramName = 'set_' . preg_replace('/[^a-zA-Z0-9_]/', '_', (string)$coluna);
+                $setClause .= $coluna . " = :" . $paramName . ", ";
+                $setParams[$paramName] = $valor;
             }
             $setClause = rtrim($setClause, ", ");
 
-            $sql = "UPDATE " . $tabela . " SET " . $setClause . " WHERE " . $condicao;
+            [$whereSql, $whereFromArrayParams] = $this->buildWhereClause($condicao, 'upd');
+
+            $sql = "UPDATE " . $tabela . " SET " . $setClause . " WHERE " . $whereSql;
             $query = $this->db_connection->prepare($sql);
 
             // Mesclar parâmetros do SET com parâmetros da condição WHERE
-            $allParams = array_merge($setParams, $condicaoParams);
+            $allParams = array_merge(
+                $this->normalizeParams($setParams),
+                $this->normalizeParams($whereFromArrayParams),
+                $this->normalizeParams(is_array($condicaoParams) ? $condicaoParams : [])
+            );
             $query->execute($allParams);
 
             return $query->rowCount();
@@ -119,9 +199,11 @@ class Database
     public function delete($tabela, $condicao)
     {
         try {
-            $sql = "DELETE FROM " . $tabela . " WHERE " . $condicao;
+            [$whereSql, $whereParams] = $this->buildWhereClause($condicao, 'del');
+
+            $sql = "DELETE FROM " . $tabela . " WHERE " . $whereSql;
             $query = $this->db_connection->prepare($sql);
-            $query->execute();
+            $query->execute($this->normalizeParams($whereParams));
 
             return $query->rowCount();
         } catch (Exception $e) {

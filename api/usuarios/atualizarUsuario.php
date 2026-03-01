@@ -7,13 +7,15 @@ headers();
 $dados = json_decode(file_get_contents("php://input"), true);
 
 if (empty($dados['id']) || empty($dados['nome']) || empty($dados['email']) || !isset($dados['senha'])) {
-    responderErro(400, "ID, nome, email e senha são obrigatórios");
+    http_response_code(400);
+    echo json_encode(["success" => false, "error" => "ID, nome, email e senha são obrigatórios"]);
     logMsg("Dados incompletos para atualização de usuário: " . json_encode($dados));
+    exit;
 }
 
 $id = $dados['id'];
 $nome = $dados['nome'];
-$email = $dados['email'];   
+$email = $dados['email'];
 $senha = $dados['senha'];
 
 $db_connection = null;
@@ -24,8 +26,10 @@ try {
     // Verificar se o usuário existe
     $usuarioExistente = $db_connection->get("usuarios", ["id" => $id]);
     if (!$usuarioExistente) {
-        responderErro(404, "Usuário não encontrado");
+        http_response_code(404);
+        echo json_encode(["success" => false, "error" => "Usuário não encontrado"]);
         logMsg("Tentativa de atualização de usuário inexistente com ID: " . $id);
+        exit;
     }
 
     // Preparar dados para atualização
@@ -43,9 +47,11 @@ try {
     // Atualizar usuário
     $db_connection->update("usuarios", $dadosAtualizacao, ["id" => $id]);
 
-    responderJson(200, ['message' => 'Usuário atualizado com sucesso']);
+    http_response_code(200);
+    echo json_encode(['success' => true, 'message' => 'Usuário atualizado com sucesso']);
     logMsg("Usuário atualizado com ID: " . $id);
 } catch (Exception $e) {
-    responderErro(500, "Erro ao atualizar usuário: " . $e->getMessage());
+    http_response_code(500);
+    echo json_encode(["success" => false, "error" => "Erro ao atualizar usuário: " . $e->getMessage()]);
     logMsg("Erro ao atualizar usuário: " . $e->getMessage());
 }
