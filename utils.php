@@ -52,7 +52,7 @@ function validarJwt()
         $decoded = JWT::decode($token, new Key(CHAVE_JWT, 'HS256'));
 
         // valida issuer
-        if ($decoded->iss !== "http://localhost/development/controle-financeiro-api/") {
+        if ($decoded->iss !== "http://localhost/controle-financeiro-api/") {
             throw new Exception("Issuer inválido");
         }
 
