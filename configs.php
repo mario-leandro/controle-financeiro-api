@@ -16,11 +16,11 @@ $routes = [
         "logout" => __DIR__ . "./api/auth/logout.php",
         "refresh_token" => __DIR__ . "./api/refresh/refreshToken.php"
     ],
-    "transactions" => [
-        "create" => __DIR__ . "./api/transactions/create.php",
-        "list" => __DIR__ . "./api/transactions/list.php",
-        "delete" => __DIR__ . "./api/transactions/delete.php"
-    ],
+    // "transactions" => [
+    //     "create" => __DIR__ . "./api/transactions/create.php",
+    //     "list" => __DIR__ . "./api/transactions/list.php",
+    //     "delete" => __DIR__ . "./api/transactions/delete.php"
+    // ],
     "check_users" => [
         "update_user" => __DIR__ . "./api/usuarios/atualizarUsuario.php",
         "list_users" => __DIR__ . "./api/usuarios/listarUsuarios.php",

@@ -1,10 +1,6 @@
 <?php
 
-include_once __DIR__ . "/../commom.php";
-
-headers();
-
-$dados = json_decode(file_get_contents("php://input"), true);
+$dados = $_REQUEST_DATA ?? [];
 
 if (empty($dados['id']) || empty($dados['nome']) || empty($dados['email']) || !isset($dados['senha'])) {
     http_response_code(400);

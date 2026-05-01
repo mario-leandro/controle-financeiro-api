@@ -2,12 +2,6 @@
 
 $dados = $_REQUEST_DATA ?? [];
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(["error" => "Método não permitido"]);
-    exit;
-}
-
 try {
     if (empty($dados['token'])) {
         http_response_code(400);

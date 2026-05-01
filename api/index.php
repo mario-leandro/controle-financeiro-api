@@ -4,9 +4,9 @@ require_once __DIR__ . "/../config/common.php";
 
 headers();
 
-$input = json_decode(file_get_contents("php://input"), true);
+$dados = json_decode(file_get_contents("php://input"), true);
 
-if (!$input) {
+if (!$dados) {
     http_response_code(400);
     echo json_encode([
         "success" => false,
@@ -15,9 +15,9 @@ if (!$input) {
     exit;
 }
 
-$type = $input["type"] ?? null;
-$action = $input["action"] ?? null;
-$data = $input["data"] ?? [];
+$type = $dados["type"] ?? null;
+$action = $dados["action"] ?? null;
+$data = $dados["data"] ?? [];
 
 if (!$type || !$action) {
     http_response_code(400);

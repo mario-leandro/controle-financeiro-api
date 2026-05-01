@@ -1,18 +1,8 @@
 <?php
 
-include_once __DIR__ . "/../common.php";
+$dados = $_REQUEST_DATA ?? [];
 
-headers();
-
-if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
-    http_response_code(405);
-    echo json_encode(["error" => "Método não permitido"]);
-    logMsg("Método não permitido em listarUsuarios.php: " . $_SERVER['REQUEST_METHOD']);
-    exit;
-}
-
-$id_usuario = $_GET['id'] ?? null;
-$token = $_GET['token'];
+$token = $dados['token'];
 $db_connection = null;
 
 function listarTodosUsuarios()
@@ -25,7 +15,7 @@ function listarTodosUsuarios()
     return $usuarios;
 }
 
-function buscarUsuarioPorId($id)
+function buscarUsuarioPorToken($id)
 {
     global $db_connection;
 
@@ -36,8 +26,8 @@ function buscarUsuarioPorId($id)
 }
 
 try {
-    if ($id_usuario) {
-        $usuario = buscarUsuarioPorId($id_usuario);
+    if ($token) {
+        $usuario = buscarUsuarioPorToken($token);
         if ($usuario) {
             http_response_code(200);
             echo json_encode(["success" => true, "usuario" => $usuario]);
