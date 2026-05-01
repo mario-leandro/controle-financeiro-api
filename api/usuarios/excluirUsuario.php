@@ -7,7 +7,9 @@ headers();
 $dados = json_decode(file_get_contents("php://input"), true);
 
 if (empty($dados['id']) || empty($dados['nome']) || empty($dados['email']) || !isset($dados['senha'])) {
-    responderErro(400, "ID, nome, email e senha são obrigatórios");
+    http_response_code(400);
+    echo json_encode(["success" => false, "error" => "ID, nome, email e senha são obrigatórios"]);
+    exit();
 }
 
 $id = $dados['id'];
@@ -23,16 +25,27 @@ try {
     // Verificar se o usuário existe
     $usuarioExistente = $db_connection->get("usuarios", ["id" => $id]);
     if (!$usuarioExistente) {
-        responderErro(404, "Usuário não encontrado");
-        logMsg("Tentativa de exclusão de usuário inexistente com ID: " . $id);
+        http_response_code(404);
+        echo json_encode([
+            "success" => false,
+            "error" =>
+            logMsg("Tentativa de exclusão de usuário inexistente com ID: " . $id)
+        ]);
+        exit();
     }
 
-    // Excluir usuário
     $db_connection->delete("usuarios", ["id" => $id]);
 
-    responderJson(200, ['message' => 'Usuário excluído com sucesso']);
-    logMsg("Usuário excluído com ID: " . $id);
+    http_response_code(200);
+    echo json_encode([
+        "success" => true,
+        "message" => "Usuário excluído com sucesso"
+    ]);
 } catch (Exception $e) {
-    responderErro(500, "Erro ao excluir usuário: " . $e->getMessage());
+    http_response_code(500);
+    echo json_encode([
+        "success" => false,
+        "error" => "Erro ao excluir usuário: " . $e->getMessage()
+    ]);
     logMsg("Erro ao excluir usuário: " . $e->getMessage());
 }

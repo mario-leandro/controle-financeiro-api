@@ -1,18 +1,6 @@
 <?php
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-include_once __DIR__ . "/../common.php";
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    logMsg("Método não permitido: " . $_SERVER['REQUEST_METHOD'] . " em " . $_SERVER['REQUEST_URI']);
-    exit;
-}
-
-$dados = json_decode(file_get_contents("php://input"), true);
+$dados = $_REQUEST_DATA ?? [];
 
 if (empty($dados['nome']) || empty($dados['email']) || empty($dados['senha'])) {
     http_response_code(400);

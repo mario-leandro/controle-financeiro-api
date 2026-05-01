@@ -10,7 +10,7 @@ if (empty($dados['id']) || empty($dados['nome']) || empty($dados['email']) || !i
     http_response_code(400);
     echo json_encode(["success" => false, "error" => "ID, nome, email e senha são obrigatórios"]);
     logMsg("Dados incompletos para atualização de usuário: " . json_encode($dados));
-    exit;
+    exit();
 }
 
 $id = $dados['id'];

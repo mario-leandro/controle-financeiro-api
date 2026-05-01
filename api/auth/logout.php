@@ -1,7 +1,6 @@
 <?php
 
-include_once __DIR__ . "/../common.php";
-headers();
+$dados = $_REQUEST_DATA ?? [];
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -10,24 +9,21 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 try {
-    $dados = json_decode(file_get_contents("php://input"), true);
-
-    if (empty($dados['refresh_token'])) {
+    if (empty($dados['token'])) {
         http_response_code(400);
         echo json_encode(["error" => "Refresh token não fornecido"]);
         exit;
     }
 
-    $refreshToken = $dados['refresh_token'];
-    $refreshHash = hashToken($refreshToken);
+    $token = $dados['token'];
+    $refreshHash = hashToken($token);
 
     $db = new Database();
 
-    // Atualiza token como revogado
     $atualizado = $db->update(
         "authentication",
         ["revogado" => 1],
-        ["token" => $refreshHash, "tipo" => "refresh"]
+        ["token" => $token, "tipo" => "refresh"]
     );
 
     if (!$atualizado) {
