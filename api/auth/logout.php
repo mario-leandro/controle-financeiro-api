@@ -1,6 +1,6 @@
 <?php
 
-$dados = $_REQUEST_DATA ?? [];
+$dados = $GLOBALS["REQUEST_DATA"] ?? [];
 
 try {
     if (empty($dados['token'])) {

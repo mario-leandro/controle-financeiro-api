@@ -70,6 +70,20 @@ function gerarRefreshToken()
     return bin2hex(random_bytes(32)); // 64 caracteres
 }
 
+// Autenticar Token
+function autenticar()
+{
+    try {
+        $decoded = validarJwt();
+        return $decoded->sub; // retorna usuario_id
+    } catch (Exception $e) {
+        http_response_code(401);
+        echo json_encode(["error" => $e->getMessage()]);
+        exit;
+    }
+}
+
+
 function hashToken($token)
 {
     return hash('sha256', $token);

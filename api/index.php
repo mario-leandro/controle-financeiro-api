@@ -1,8 +1,19 @@
 <?php
 
-require_once __DIR__ . "/../config/common.php";
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-headers();
+require_once __DIR__ . "/common.php";
+
+// headers();
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(["error" => "Método não permitido"]);
+    logMsg("Método não permitido: " . $_SERVER['REQUEST_METHOD'] . " em " . $_SERVER['REQUEST_URI']);
+    exit;
+}
 
 $dados = json_decode(file_get_contents("php://input"), true);
 
@@ -15,22 +26,14 @@ if (!$dados) {
     exit;
 }
 
-$type = $dados["type"] ?? null;
-$action = $dados["action"] ?? null;
+$type = $dados["type"];
+$action = $dados["action"];
 $data = $dados["data"] ?? [];
 
+// var_dump($type);
+// var_dump($action);
+
 if (!$type || !$action) {
-    http_response_code(400);
-    echo json_encode([
-        "success" => false,
-        "message" => "Informe type e action"
-    ]);
-    exit;
-}
-
-global $routes;
-
-if (!isset($routes[$type][$action])) {
     http_response_code(404);
     echo json_encode([
         "success" => false,
@@ -39,6 +42,18 @@ if (!isset($routes[$type][$action])) {
     exit;
 }
 
-$_REQUEST_DATA = $data;
+$routes = pathRoutes($type, $action);
 
-require_once $routes[$type][$action];
+if (!$routes) {
+    http_response_code(404);
+    echo json_encode([
+        "success" => false,
+        "message" => "Rota não encontrada"
+    ]);
+    exit;
+}
+
+$GLOBALS["REQUEST_DATA"] = $data;
+// var_dump($GLOBALS["REQUEST_DATA"] = $data);
+
+require_once $routes;

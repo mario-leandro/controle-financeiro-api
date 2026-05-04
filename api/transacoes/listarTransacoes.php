@@ -1,9 +1,6 @@
 <?php
 
 include_once __DIR__ . "/../common.php";
-include_once __DIR__ . "/../middlewares/AuthMiddleware.php";
-
-headers();
 
 $usuarioId = autenticar();
 

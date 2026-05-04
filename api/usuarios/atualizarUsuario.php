@@ -1,6 +1,6 @@
 <?php
 
-$dados = $_REQUEST_DATA ?? [];
+$dados = $GLOBALS["REQUEST_DATA"] ?? [];
 
 if (empty($dados['id']) || empty($dados['nome']) || empty($dados['email']) || !isset($dados['senha'])) {
     http_response_code(400);
