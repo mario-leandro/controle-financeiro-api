@@ -4,7 +4,7 @@ $dados = $GLOBALS["REQUEST_DATA"] ?? [];
 
 if (empty($dados['id']) || empty($dados['nome']) || empty($dados['email']) || !isset($dados['senha'])) {
     http_response_code(400);
-    echo json_encode(["success" => false, "error" => "ID, nome, email e senha são obrigatórios"]);
+    echo json_encode(["success" => false, "error" => "ID, nome, email e senha são obrigatórios para atualização"]);
     logMsg("Dados incompletos para atualização de usuário: " . json_encode($dados));
     exit();
 }

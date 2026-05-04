@@ -6,7 +6,7 @@ error_reporting(E_ALL);
 
 require_once __DIR__ . "/common.php";
 
-// headers();
+headers();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -51,6 +51,19 @@ if (!$routes) {
         "message" => "Rota não encontrada"
     ]);
     exit;
+}
+
+$rotasPublicas = [
+    "auth/login",
+    "auth/register",
+    "auth/refresh_token"
+];
+
+$rotaAtual = $type . "/" . $action;
+
+if (!in_array($rotaAtual, $rotasPublicas)) {
+    $usuarioId = autenticar();
+    $GLOBALS["usuario_id"] = $usuarioId;
 }
 
 $GLOBALS["REQUEST_DATA"] = $data;

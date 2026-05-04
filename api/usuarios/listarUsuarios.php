@@ -2,7 +2,7 @@
 
 $dados = $GLOBALS["REQUEST_DATA"] ?? [];
 
-$token = $dados['token'];
+$usuarioId = $dados['usuarioId'] ?? null;
 $db_connection = null;
 
 function listarTodosUsuarios()
@@ -15,19 +15,19 @@ function listarTodosUsuarios()
     return $usuarios;
 }
 
-function buscarUsuarioPorToken($id)
+function buscarUsuarioPorId($usuarioId)
 {
     global $db_connection;
 
     $db_connection = new Database();
-    $usuario = $db_connection->get("usuarios", ["id" => $id]);
+    $usuario = $db_connection->get("usuarios", ["id" => $usuarioId]);
 
     return $usuario ? $usuario[0] : null;
 }
 
 try {
-    if ($token) {
-        $usuario = buscarUsuarioPorToken($token);
+    if ($usuarioId) {
+        $usuario = buscarUsuarioPorId($usuarioId);
         if ($usuario) {
             http_response_code(200);
             echo json_encode(["success" => true, "usuario" => $usuario]);
