@@ -23,16 +23,3 @@ function headers()
         exit();
     }
 }
-
-function criarUsuario($nome, $email, $senhaHash)
-{
-    $db_connection = new Database();
-    $novoUsuario = [
-        "nome" => $nome,
-        "email" => $email,
-        "senha" => $senhaHash,
-        "criado_em" => date("Y-m-d H:i:s")
-    ];
-
-    return $db_connection->insert("usuarios", $novoUsuario);
-}

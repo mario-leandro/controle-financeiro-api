@@ -1,40 +1,57 @@
 <?php
 
 $dados = $GLOBALS["REQUEST_DATA"] ?? [];
+// var_dump($dados);
 
-if (empty($dados['nome']) || empty($dados['email']) || empty($dados['senha'])) {
+$nome = $dados['nome'];
+$email = $dados['email'];
+$senha = $dados['senha'];
+$conf_senha = $dados['conf_senha'];
+
+if (empty($nome) || empty($email) || empty($senha) || empty($conf_senha)) {
     http_response_code(400);
-    echo json_encode(["error" => "Nome, email e senha são obrigatórios"]);
-    logMsg("Dados incompletos para registro: " . json_encode($dados));
-    exit;
+    echo json_encode(["success" => false, "message" => "Nome, email, senha e confirmação de senha são obrigatórios"]);
+    exit();
+}
+
+if ($senha !== $conf_senha) {
+    http_response_code(400);
+    echo json_encode([
+        "success" => false,
+        "message" => "senha e confirmação de senha são diferentes"
+    ]);
+    exit();
 }
 
 $db_connection = null;
 
 try {
     $db_connection = new Database();
+    // var_dump($db_connection);
 
-    $usuarioExistente = $db_connection->get("usuarios", ["email" => $dados['email']]);
+    $usuarioExistente = $db_connection->get("usuarios", ["email" => $email]);
 
     if ($usuarioExistente) {
         http_response_code(409);
-        echo json_encode(["error" => "Email já cadastrado"]);
-        logMsg("Email já cadastrado: " . $dados['email']);
-        exit;
+        echo json_encode(["success" => false, "error" => "Email já cadastrado"]);
+        exit();
     }
 
-    $senhaHash = password_hash($dados['senha'], PASSWORD_BCRYPT);
+    $senhaHash = password_hash($senha, PASSWORD_BCRYPT);
 
-    $usuarioId = criarUsuario(
-        $dados['nome'],
-        $dados['email'],
-        $senhaHash
-    );
+    $novoUsuario = [
+        "nome" => $nome,
+        "email" => $email,
+        "senha" => $senhaHash,
+        "criado_em" => date("Y-m-d H:i:s")
+    ];
+
+    $db_connection->insert("usuarios", $novoUsuario);
 
     http_response_code(201);
     echo json_encode([
         "success" => true,
-        "usuario_id" => $usuarioId
+        "usuario_id" => $novoUsuario
     ]);
 } catch (Exception $e) {
     http_response_code(500);
