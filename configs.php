@@ -31,11 +31,11 @@ function pathRoutes($type, $action)
             "logout" => __DIR__ . "/api/auth/logout.php",
             "refresh_token" => __DIR__ . "/api/refresh/refreshToken.php"
         ),
-        // "transactions" => [
-        //     "create" => __DIR__ . "/api/transactions/create.php",
-        //     "list" => __DIR__ . "/api/transactions/list.php",
-        //     "delete" => __DIR__ . "/api/transactions/delete.php"
-        // ],
+        "transactions" => [
+            "create" => __DIR__ . "/api/transacoes/adicionarTransacao.php",
+            "list" => __DIR__ . "/api/transacoes/listarTransacoes.php",
+            // "delete" => __DIR__ . "/api/transacoes/delete.php"
+        ],
         "check_users" => array(
             // "update_user" => __DIR__ . "/api/usuarios/atualizarUsuario.php",
             "list_users" => __DIR__ . "/api/usuarios/listarUsuarios.php",
