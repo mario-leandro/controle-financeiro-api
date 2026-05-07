@@ -38,51 +38,51 @@ if (!is_numeric($valor) || $valor <= 0) {
     exit;
 }
 
-$db = new Database();
+try {
+    $db = new Database();
 
-$conta = $db->get("accounts", [
-    "id" => $accountId,
-    "usuario_id" => $usuarioId
-]);
-
-if (!$conta) {
-    http_response_code(404);
-    echo json_encode(["success" => false, "message" => "Conta não encontrada"]);
-    exit;
-}
-
-if ($categoryId) {
-    $categoria = $db->get("categories", [
-        "id" => $categoryId,
+    $conta = $db->get("accounts", [
+        "id" => $accountId,
         "usuario_id" => $usuarioId
     ]);
 
-    if (!$categoria) {
+    if (!$conta) {
         http_response_code(404);
-        echo json_encode(["success" => false, "message" => "Categoria não encontrada"]);
+        echo json_encode(["success" => false, "message" => "Conta não encontrada"]);
         exit;
     }
-}
 
-$id = $db->insert("transactions", [
-    "usuario_id" => $usuarioId,
-    "account_id" => $accountId,
-    "category_id" => $categoryId ?: null,
-    "tipo" => $tipo,
-    "descricao" => $descricao,
-    "valor" => $valor,
-    "data_transacao" => $dataTransacao,
-    "observacao" => $observacao
-]);
+    if ($categoryId) {
+        $categoria = $db->get("categories", [
+            "id" => $categoryId,
+            "usuario_id" => $usuarioId
+        ]);
 
-if (!$id) {
+        if (!$categoria) {
+            http_response_code(404);
+            echo json_encode(["success" => false, "message" => "Categoria não encontrada"]);
+            exit;
+        }
+    }
+
+    $id = $db->insert("transactions", [
+        "usuario_id" => $usuarioId,
+        "account_id" => $accountId,
+        "category_id" => $categoryId ?: null,
+        "tipo" => $tipo,
+        "descricao" => $descricao,
+        "valor" => $valor,
+        "data_transacao" => $dataTransacao,
+        "observacao" => $observacao
+    ]);
+
+    echo json_encode([
+        "success" => true,
+        "message" => "Transação cadastrada com sucesso",
+        "data" => ["id" => $id]
+    ]);
+} catch (Exception $e) {
     http_response_code(500);
     echo json_encode(["success" => false, "message" => "Erro ao cadastrar transação"]);
     exit;
 }
-
-echo json_encode([
-    "success" => true,
-    "message" => "Transação cadastrada com sucesso",
-    "data" => ["id" => $id]
-]);
