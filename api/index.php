@@ -1,8 +1,7 @@
 <?php
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+ini_set('display_errors', 0);
+error_reporting(0);
 
 require_once __DIR__ . "/common.php";
 
@@ -70,3 +69,9 @@ $GLOBALS["REQUEST_DATA"] = $data;
 // var_dump($GLOBALS["REQUEST_DATA"] = $data);
 
 require_once $routes;
+
+logMsg([
+    "type" => $type,
+    "action" => $action,
+    "usuario" => $GLOBALS["usuario_id"] ?? null
+]);
