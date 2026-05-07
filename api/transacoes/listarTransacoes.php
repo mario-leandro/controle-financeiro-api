@@ -1,10 +1,41 @@
 <?php
 
-include_once __DIR__ . "/../common.php";
+$dados = $GLOBALS["REQUEST_DATA"] ?? [];
+$usuarioId = $GLOBALS["usuario_id"] ?? null;
 
-$usuarioId = autenticar();
+if (!$usuarioId) {
+    http_response_code(401);
+    echo json_encode(["success" => false, "message" => "Usuário não autenticado"]);
+    exit;
+}
 
-echo json_encode([
-    "mensagem" => "Usuário autenticado",
-    "usuario_id" => $usuarioId
-]);
+$db_connection = null;
+
+try {
+    $db_connection = new Database();
+
+    $transacoes = $db_connection->get(
+        "transactions",
+        ["usuario_id" => $usuarioId],
+        [
+            "id",
+            "account_id",
+            "category_id",
+            "tipo",
+            "descricao",
+            "valor",
+            "data_transacao",
+            "observacao",
+            "created_at"
+        ]
+    );
+
+    echo json_encode([
+        "success" => true,
+        "message" => "Transações listadas com sucesso",
+        "data" => $transacoes
+    ]);
+} catch (\Throwable $th) {
+    http_response_code(500);
+    echo json_encode(["error" => "Erro ao listar transações"]);
+}
