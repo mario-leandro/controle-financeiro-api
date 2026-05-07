@@ -34,7 +34,7 @@ function pathRoutes($type, $action)
         "transactions" => [
             "create" => __DIR__ . "/api/transacoes/adicionarTransacao.php",
             "list" => __DIR__ . "/api/transacoes/listarTransacoes.php",
-            // "delete" => __DIR__ . "/api/transacoes/delete.php"
+            "delete" => __DIR__ . "/api/transacoes/delete.php"
         ],
         "check_users" => array(
             // "update_user" => __DIR__ . "/api/usuarios/atualizarUsuario.php",
