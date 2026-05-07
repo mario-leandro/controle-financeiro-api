@@ -1,14 +1,11 @@
 <?php
 
-require_once __DIR__ . "/../../Database/database.php";
-
 $data = $GLOBALS["REQUEST_DATA"] ?? [];
 $usuarioId = $GLOBALS["usuario_id"] ?? null;
 
 $nome = $data["nome"] ?? null;
 $tipo = strtolower($data["tipo"]) ?? null;
-$cor = $data["cor"] ?? null;
-$icone = $data["icone"] ?? null;
+$saldoInicial = $data["saldo_inicial"] ?? 0;
 
 if (!$usuarioId) {
     http_response_code(401);
@@ -22,26 +19,26 @@ if (!$nome || !$tipo) {
     exit;
 }
 
-$tiposPermitidos = ["receita", "despesa"];
+$tiposPermitidos = ["conta_corrente", "poupanca", "carteira", "cartao", "investimento"];
 
 if (!in_array($tipo, $tiposPermitidos)) {
     http_response_code(400);
-    echo json_encode(["success" => false, "message" => "Tipo de categoria inválido"]);
+    echo json_encode(["success" => false, "message" => "Tipo de conta inválido"]);
     exit;
 }
 
-$db_connection = new DataBase();
+$db = new DataBase();
 
-$id = $db_connection->insert("categories", [
+$id = $db->insert("accounts", [
     "usuario_id" => $usuarioId,
     "nome" => $nome,
     "tipo" => $tipo,
-    "cor" => $cor,
-    "icone" => $icone
+    "saldo_inicial" => $saldoInicial,
+    "ativa" => 1
 ]);
 
 echo json_encode([
     "success" => true,
-    "message" => "Categoria cadastrada com sucesso",
+    "message" => "Conta cadastrada com sucesso",
     "data" => ["id" => $id]
 ]);

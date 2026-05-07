@@ -41,6 +41,14 @@ function pathRoutes($type, $action)
             "list_users" => __DIR__ . "/api/usuarios/listarUsuarios.php",
             // "delete_user" => __DIR__ . "/api/usuarios/excluirUsuario.php"
         ),
+        "accounts" => [
+            "create" => __DIR__ . "/api/contas/adicionarConta.php",
+            "list" => __DIR__ . "/api/contas/listarContas.php"
+        ],
+        "categories" => [
+            "create" => __DIR__ . "/api/categorias/adicionarCategoria.php",
+            "list" => __DIR__ . "/api/categorias/listarCategorias.php"
+        ],
     );
 
     if (isset($routes[$type][$action])) {
