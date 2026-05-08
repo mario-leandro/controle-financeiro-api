@@ -26,7 +26,7 @@ if (!$tipo || !$accountId || !$descricao || !$valor || !$dataTransacao) {
     exit;
 }
 
-if (!in_array($tipo, ["receita", "despesa", "transferencia"])) {
+if (!in_array($tipo, ["receita", "despesa"])) {
     http_response_code(400);
     echo json_encode(["success" => false, "message" => "Tipo inválido"]);
     exit;
