@@ -6,20 +6,10 @@ $dados = $GLOBALS["REQUEST_DATA"] ?? [];
 $nome = $dados['nome'];
 $email = $dados['email'];
 $senha = $dados['senha'];
-$conf_senha = $dados['conf_senha'];
 
-if (empty($nome) || empty($email) || empty($senha) || empty($conf_senha)) {
+if (empty($nome) || empty($email) || empty($senha)) {
     http_response_code(400);
-    echo json_encode(["success" => false, "message" => "Nome, email, senha e confirmação de senha são obrigatórios"]);
-    exit();
-}
-
-if ($senha !== $conf_senha) {
-    http_response_code(400);
-    echo json_encode([
-        "success" => false,
-        "message" => "senha e confirmação de senha são diferentes"
-    ]);
+    echo json_encode(["success" => false, "message" => "Nome, email, senha são obrigatórios"]);
     exit();
 }
 

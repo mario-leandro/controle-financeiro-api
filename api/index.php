@@ -68,6 +68,15 @@ if (!in_array($rotaAtual, $rotasPublicas)) {
 $GLOBALS["REQUEST_DATA"] = $data;
 // var_dump($GLOBALS["REQUEST_DATA"] = $data);
 
+// var_dump([
+//     "type" => $type,
+//     "action" => $action,
+//     "rotaAtual" => $type . "/" . $action,
+//     "routes" => $routes,
+//     "exists" => file_exists($routes)
+// ]);
+// exit;
+
 require_once $routes;
 
 logMsg([
