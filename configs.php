@@ -29,7 +29,8 @@ function pathRoutes($type, $action)
             "login" => __DIR__ . "/api/auth/login.php",
             "register" => __DIR__ . "/api/auth/register.php",
             "logout" => __DIR__ . "/api/auth/logout.php",
-            "refresh_token" => __DIR__ . "/api/refresh/refreshToken.php"
+            "refresh_token" => __DIR__ . "/api/refresh/refreshToken.php",
+            "me" => __DIR__ . "/api/auth/me.php"
         ),
         "transactions" => [
             "create" => __DIR__ . "/api/transacoes/adicionarTransacao.php",

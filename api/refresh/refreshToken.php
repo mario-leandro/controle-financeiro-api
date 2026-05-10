@@ -1,22 +1,6 @@
 <?php
 
-include_once __DIR__ . "/../common.php";
-headers();
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    exit;
-}
-
-$raw = file_get_contents("php://input");
-
-if (!$raw) {
-    http_response_code(400);
-    echo json_encode(["error" => "Body vazio"]);
-    exit;
-}
-
-$dados = json_decode($raw, true);
+$dados = $GLOBALS["REQUEST_DATA"] ?? [];
 
 if (!is_array($dados)) {
     http_response_code(400);

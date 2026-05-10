@@ -44,6 +44,7 @@ try {
     ]);
 
     echo json_encode([
+        "success" => true,
         "access_token" => $accessToken,
         "refresh_token" => $refreshToken,
         "usuario" => [
