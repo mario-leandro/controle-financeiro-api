@@ -18,9 +18,7 @@ try {
         "usuarios",
         ["id" => $usuarioId],
         ["id", "nome", "email", "criado_em"]
-    );
-
-    // $usuario = $usuarios[0] ?? null;
+    )[0] ?? null;
 
     if (!$usuario) {
         http_response_code(404);
