@@ -2,9 +2,9 @@
 
 $dados = $GLOBALS["REQUEST_DATA"] ?? [];
 
-if (empty($dados['id']) || empty($dados['nome']) || empty($dados['email']) || !isset($dados['senha'])) {
+if (empty($dados['id'])) {
     http_response_code(400);
-    echo json_encode(["success" => false, "error" => "ID, nome, email e senha são obrigatórios para atualização"]);
+    echo json_encode(["success" => false, "error" => "ID é obrigatório para atualização"]);
     logMsg("Dados incompletos para atualização de usuário: " . json_encode($dados));
     exit();
 }
@@ -12,7 +12,7 @@ if (empty($dados['id']) || empty($dados['nome']) || empty($dados['email']) || !i
 $id = $dados['id'];
 $nome = $dados['nome'];
 $email = $dados['email'];
-$senha = $dados['senha'];
+$foto_url = $dados['foto_url'] ?? null;
 
 $db_connection = null;
 
@@ -31,7 +31,8 @@ try {
     // Preparar dados para atualização
     $dadosAtualizacao = [
         "nome" => $nome,
-        "email" => $email
+        "email" => $email,
+        "foto_url" => $foto_url
     ];
 
     if (!empty($senha)) {

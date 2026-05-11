@@ -17,7 +17,7 @@ try {
     $usuario = $db_connection->get(
         "usuarios",
         ["id" => $usuarioId],
-        ["id", "nome", "email", "criado_em"]
+        ["id", "nome", "email", "foto_url", "criado_em"]
     )[0] ?? null;
 
     if (!$usuario) {
