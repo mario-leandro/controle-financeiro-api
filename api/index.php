@@ -77,6 +77,8 @@ $GLOBALS["REQUEST_DATA"] = $data;
 // ]);
 // exit;
 
+// echo "entrou aqui";
+
 require_once $routes;
 
 logMsg([

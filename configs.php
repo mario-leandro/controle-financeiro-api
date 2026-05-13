@@ -1,6 +1,8 @@
 <?php
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/');
+require_once __DIR__ . "/vendor/autoload.php";
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . "/../home/walletmotion/");
 $dotenv->load();
 
 $db_host = $_ENV["DB_HOST"];
@@ -16,7 +18,7 @@ define('DB_USER', $db_user);
 define('DB_PASS', $db_pass);
 define('DB_NAME', $db_name);
 
-define("DIR_LOGS", __DIR__ . "/logs/");
+define("DIR_LOGS", __DIR__ . "/../home/walletmotion/logs/");
 
 define("CHAVE_JWT", $chave_jwt);
 define("JWT_ISS", $jwt_iss);
