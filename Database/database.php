@@ -213,6 +213,19 @@ class Database
         }
     }
 
+    public function sql($sql)
+    {
+        try {
+            $query = $this->db_connection->prepare($sql);
+            $query->execute();
+            return $query->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            echo "Database sql error: " . $e->getMessage();
+            logMsg("Database sql error: " . $e->getMessage());
+            return false;
+        }
+    }
+
     public function lastInsertId()
     {
         return $this->db_connection->lastInsertId();

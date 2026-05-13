@@ -14,21 +14,7 @@ $db_connection = null;
 try {
     $db_connection = new Database();
 
-    $transacoes = $db_connection->get(
-        "transactions",
-        ["usuario_id" => $usuarioId],
-        [
-            "id",
-            "account_id",
-            "category_id",
-            "tipo",
-            "descricao",
-            "valor",
-            "data_transacao",
-            "observacao",
-            "created_at"
-        ]
-    );
+    $transacoes = $db_connection->sql("SELECT t.*, c.nome FROM cf_db.transactions t INNER JOIN cf_db.categories c ON t.category_id = c.id WHERE t.usuario_id = " . $usuarioId);
 
     echo json_encode([
         "success" => true,
