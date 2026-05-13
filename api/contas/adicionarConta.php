@@ -6,6 +6,9 @@ $usuarioId = $GLOBALS["usuario_id"] ?? null;
 $nome = $data["nome"] ?? null;
 $tipo = strtolower($data["tipo"]) ?? null;
 $saldoInicial = $data["saldo_inicial"] ?? 0;
+$limiteTotal = $data["limite_total"] ?? 0;
+$diaFechamento = $data["dia_fechamento"] ?? null;
+$diaVencimento = $data["dia_vencimento"] ?? null;
 
 if (!$usuarioId) {
     http_response_code(401);
@@ -34,6 +37,9 @@ $id = $db->insert("accounts", [
     "nome" => $nome,
     "tipo" => $tipo,
     "saldo_inicial" => $saldoInicial,
+    "limite_total" => $limiteTotal,
+    "dia_fechamento" => $diaFechamento ?: null,
+    "dia_vencimento" => $diaVencimento ?: null,
     "ativa" => 1
 ]);
 
