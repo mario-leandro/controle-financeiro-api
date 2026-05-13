@@ -19,8 +19,8 @@ try {
     SELECT 
         t.*,
         c.nome AS categoria_nome
-    FROM cf_db.transactions t
-    LEFT JOIN " . DB_NAME . ".categories c 
+    FROM walletmotion_db.transactions t
+    LEFT JOIN walletmotion_db.categories c 
         ON t.category_id = c.id
     WHERE t.usuario_id = " . (int)$usuarioId
     );
