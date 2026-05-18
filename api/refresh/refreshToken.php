@@ -70,10 +70,17 @@ try {
     ]);
 
     echo json_encode([
-        "access_token" => $novoAccessToken,
-        "refresh_token" => $novoRefreshToken
+        "success" => true,
+        "message" => "Token renovado com sucesso",
+        "data" => [
+            "access_token" => $novoAccessToken,
+            "refresh_token" => $novoRefreshToken
+        ]
     ]);
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(["error" => "Erro ao renovar token"]);
+    echo json_encode([
+        "success" => false,
+        "message" => "Erro ao renovar token"
+    ]);
 }

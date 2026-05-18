@@ -3,12 +3,14 @@
 $dados = $GLOBALS["REQUEST_DATA"] ?? [];
 $usuarioId = $GLOBALS["usuario_id"] ?? null;
 
-$tipo = $dados["tipo"] ?? null;
-$accountId = $dados["account_id"] ?? null;
-$categoryId = $dados["category_id"] ?? null;
-$descricao = $dados["descricao"] ?? null;
-$valor = $dados["valor"] ?? null;
-$dataTransacao = $dados["data_transacao"] ?? null;
+$tipo = $dados["tipo"];
+$accountId = $dados["account_id"];
+$categoryId = $dados["category_id"];
+$descricao = $dados["descricao"];
+$valor = $dados["valor"];
+$metodoPagamento = $dados["metodo_pagamento"] ?? null;
+$parcelas = $dados["parcelas"] ?? null;
+$dataTransacao = $dados["data_transacao"];
 $observacao = $dados["observacao"] ?? null;
 
 if (!$usuarioId) {
@@ -38,10 +40,24 @@ if (!is_numeric($valor) || $valor <= 0) {
     exit;
 }
 
-try {
-    $db = new Database();
+if ($metodoPagamento === "credito") {
+    if (!isset($parcelas)) {
+        http_response_code(400);
+        echo json_encode(["success" => false, "message" => "Parcelas é obrigatório"]);
+        exit;
+    }
 
-    $conta = $db->get("accounts", [
+    if (!is_numeric($parcelas) || $parcelas <= 0) {
+        http_response_code(400);
+        echo json_encode(["success" => false, "message" => "Parcelas inválidas"]);
+        exit;
+    }
+}
+
+try {
+    $db_connection = new Database();
+
+    $conta = $db_connection->get("accounts", [
         "id" => $accountId,
         "usuario_id" => $usuarioId
     ]);
@@ -53,7 +69,7 @@ try {
     }
 
     if ($categoryId) {
-        $categoria = $db->get("categories", [
+        $categoria = $db_connection->get("categories", [
             "id" => $categoryId,
             "usuario_id" => $usuarioId
         ]);
@@ -65,13 +81,15 @@ try {
         }
     }
 
-    $id = $db->insert("transactions", [
+    $id = $db_connection->insert("transactions", [
         "usuario_id" => $usuarioId,
         "account_id" => $accountId,
-        "category_id" => $categoryId ?: null,
+        "category_id" => $categoryId,
         "tipo" => $tipo,
         "descricao" => $descricao,
         "valor" => $valor,
+        "metodo_pagamento" => $metodoPagamento,
+        "parcelas" => $parcelas,
         "data_transacao" => $dataTransacao,
         "observacao" => $observacao
     ]);
